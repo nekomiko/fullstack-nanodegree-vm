@@ -1,0 +1,15 @@
+# Tournament project.
+### Vagrant:
+Project redistributed in pair with configured Vagrant environment, in which python, its dependencies and configured database are bundled.
+Just shoot `vagrant up` from vagrant directory and `vagrant ssh`. Then you can skip environment setup and jump to "First run".
+
+### Environment:
+Python2, dependencies: psycopg2 (`pip install psyconpg2` or `apt-get install python-psycopg2`)
+PostgesSQL: application tries to connect to local `tournament` database.
+
+### First run:
+You need to have `tournament` database created and neccessary tables defined in tournament.sql (with something like `psql -d tournament -f tournament.sql`)
+
+### Run:
+Use `python tournament_test.py` to run tests, or use `tournament` module for something else.
+
