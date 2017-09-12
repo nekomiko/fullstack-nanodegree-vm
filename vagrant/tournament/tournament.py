@@ -13,14 +13,34 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("DELETE from match_results");
+    cur.execute("DELETE from matches;");
+    cur.close()
+    conn.commit()
+    conn.close()
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("DELETE from players;")
+    cur.close()
+    conn.commit()
+    conn.close()
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) from players;")
+    count = cur.fetchone()[0]
+    cur.close()
+    conn.close()
+    return count
 
 
 def registerPlayer(name):
@@ -32,6 +52,13 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO players (name) VALUES(%s);", (name,))
+    cur.close()
+    conn.commit()
+    conn.close()
+
 
 
 def playerStandings():
@@ -47,6 +74,15 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("SELECT id, name, wins, matches from matches_stat;")
+    players = cur.fetchall()
+    cur.close()
+    conn.close()
+    return players
+
+
 
 
 def reportMatch(winner, loser):
@@ -56,6 +92,14 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO matches (player1, player2) VALUES(%s,%s) RETURNING ID;", (winner, loser))
+    match_id = cur.fetchone()[0]
+    cur.execute("INSERT INTO match_results (match_id, player_win) VALUES(%s,%s);", (match_id, winner))
+    cur.close()
+    conn.commit()
+    conn.close()
  
  
 def swissPairings():
@@ -73,5 +117,15 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    p_stats = playerStandings()
+    p_stats.sort(key=lambda s:s[2])
+    result = []
+    for i in range(len(p_stats)/2):
+        result.append((p_stats[2*i][0], p_stats[2*i][1], p_stats[2*i+1][0], p_stats[2*i+1][1]))
+
+    return result
+    
+
+
 
 
